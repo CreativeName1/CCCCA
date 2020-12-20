@@ -8,16 +8,31 @@ Classes
             padding-top: 10px;
             padding-bottom: 20px;
         }
+        #className {
+            font-weight: bold;
+        }
     </style>
 {% endblock %}
 {% block body %}
     {% for class in classes %}
         <div id=class>
-            {{ class.className }}
+            <div id=className>
+                {{ class.className }}
+            </div>
             <div>
-                Max children: {{ class.classNum }}
-                Grade: {{ class.classGrade }}
-                Description: {{ class.classDesc }}
+                <div>
+                    Max children: {{ class.classNum }}
+                </div>
+                <div>
+                    Grade: {{ class.classGrade }}
+                </div>
+                <div>
+                    Description: {{ class.classDesc }}
+                </div>
+                
+                <form action="{{ url_for('classView', classId = class.classId) }}">
+                    <button>View</button>
+                </form>
             </div>
         </div>
     {% endfor %}

@@ -45,7 +45,7 @@ def index():
 
         logging.debug(session)
 
-        sid=session["sid"][0]
+        sid=session["sid"]
 
         teacher=session["teacher"]
 
@@ -165,8 +165,6 @@ def classCreateComplete():
             flash("Make sure to fill in all empty fields.")
             return render_template("classCreate.html")
 
-    logging.debug("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", className, classNum, classGrade, classDesc)
-
     db.execute("INSERT INTO ClassInfo (className, classNum, classGrade, classDesc, teacherId) VALUES (:className, :classNum, :classGrade, :classDesc, :teacherId)", 
     {"className": className, "classNum": classNum, "classGrade": classGrade, "classDesc": classDesc, "teacherId": teacherId})
     db.commit()
@@ -177,3 +175,14 @@ def classCreateComplete():
 def classes():
     classes = db.execute("SELECT * FROM ClassInfo")
     return render_template("classes.html", classes=classes)
+
+@app.route("/classes/<int:classId>")
+def classView(classId):
+    aClass = db.execute("SELECT * FROM ClassInfo WHERE classId = :classId", {"classId": classId}).fetchone()
+    return render_template("class.html", aClass=aClass)
+
+@app.route("/classes/<int:classId>/classRegister")
+def classRegister(classId):
+    
+    flash("Succesfully signed up for this class.")
+    return render_template("success.html", message="You successfully signed up for this class.")
