@@ -21,7 +21,7 @@ Classes
             </div>
             <div>
                 <div>
-                    Max children: {{ class.classNum }}
+                    Capacity: {{ class.classNum }}
                 </div>
                 <div>
                     Grade: {{ class.classGrade }}
@@ -29,7 +29,13 @@ Classes
                 <div>
                     Description: {{ class.classDesc }}
                 </div>
-                
+                <div>
+                    Teacher: {% for teacher in teachers %}
+                                {% if teacher.id == class.teacherId %}
+                                    {{ [teacher.firstname, teacher.lastname]|join(" ") }}
+                                {% endif %}
+                            {% endfor %}
+                </div>
                 <form action="{{ url_for('classView', classId = class.classId) }}">
                     <button>View</button>
                 </form>

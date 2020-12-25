@@ -43,8 +43,6 @@ def index():
         loginCheck = True
         message = "You are logged in as " + email
 
-        logging.debug(session)
-
         sid=session["sid"]
 
         teacher=session["teacher"]
@@ -108,12 +106,10 @@ def loginComplete():
     password = request.form.get("password")
 
     check = db.execute("SELECT id, email, password, teacher FROM AccountInfo WHERE email = :email AND password = :password", {"email": email, "password": password}).fetchall()
-    logging.debug(check)
     if check != []:
         session['email'] = email
         session["sid"] = check[0][0]
         session["teacher"] = check[0][3]
-        logging.debug(session["teacher"])
         return redirect("/")
     else:
         flash("Invalid login credentials.")
@@ -173,16 +169,19 @@ def classCreateComplete():
 
 @app.route("/classes", methods=["POST", "GET"])
 def classes():
-    classes = db.execute("SELECT * FROM ClassInfo")
-    return render_template("classes.html", classes=classes)
+    classes = db.execute("SELECT * FROM ClassInfo").fetchall()
+    teachers = db.execute("SELECT * FROM AccountInfo WHERE teacher = 1").fetchall()
+    return render_template("classes.html", classes=classes, teachers=teachers)
 
-@app.route("/classes/<int:classId>")
+@app.route("/classes/<int:classId>", methods=["POST", "GET"])
 def classView(classId):
     aClass = db.execute("SELECT * FROM ClassInfo WHERE classId = :classId", {"classId": classId}).fetchone()
-    return render_template("class.html", aClass=aClass)
+    children = db.execute("SELECT * FROM ChildInfo WHERE parentId = :sid", {"sid": session["sid"]})
+    return render_template("class.html", aClass=aClass, children=children)
 
-@app.route("/classes/<int:classId>/classRegister")
+@app.route("/classes/<int:classId>/classRegister", methods=["POST", "GET"])
 def classRegister(classId):
-    
-    flash("Succesfully signed up for this class.")
+    childId = int(request.form.get("child"))
+    db.execute("UPDATE ChildInfo SET classId = :classId WHERE id = :childId", {"classId": classId, "childId": childId})
+    db.commit()
     return render_template("success.html", message="You successfully signed up for this class.")
